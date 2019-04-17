@@ -41,7 +41,7 @@
                 placeholder="What needs to be done?" class="new-todo">
         </header>
         <section class="main">
-            <input id="toggle-all" type="checkbox" class="toggle-all">
+            <input id="toggle-all" type="checkbox" class="toggle-all" v-model='isCheckAll'>
             <label for="toggle-all">Mark all as complete</label>
             <ul class="todo-list" v-cloak>
                 <transition-group name="list-complete" tag="p">
@@ -164,6 +164,21 @@
                     return evl.isDone
                 }).length
             },
+            isCheckAll:{
+                get:function(){
+                   let totalNum=this.todos.length;
+                   let checkboxNum=this.todos.filter(item=>{
+                       return item.isDone
+                   }).length;
+                   console.log(totalNum,checkboxNum);
+                   return totalNum=checkboxNum;
+                },
+                set:function(v){
+                  this.todos.filter(item=>{
+                    item.isDone=v
+                  })
+                }
+            }
         },
     })
 </script>
