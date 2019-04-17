@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .sisi-enter-active {
+            animation: sisi-in .5s;
+        }
+
+        .sisi-leave-active {
+            animation: sisi-in .5s reverse;
+        }
+
+        @keyframes sisi-in {
+            0% {
+                transform: scale(0) ;
+            }
+
+            50% {
+                transform: scale(1.5) rotateY(500px) ;
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="example-2">
+        <button @click="show = !show">Toggle show</button>
+        <transition name="sisi">
+            <img src="./img/乖乖.jpg" alt="" v-if="show">
+        </transition>
+    </div>
+</body>
+
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+
+    new Vue({
+        el: '#example-2',
+        data: {
+            show: true
+        }
+    })
+
+</script>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./css/index.css">
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+
+        .list-complete-item {
+            transition: all 1s;
+            display: block;
+            margin-right: 10px;
+        }
+
+        .list-complete-enter,
+        .list-complete-leave-to
+
+        /* .list-complete-leave-active for below version 2.1.8 */
+            {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .list-complete-leave-active {
+            position: absolute;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="todoapp">
+        <header class="header">
+            <h1>todos</h1>
+            <input autofocus="autofocus" autocomplete="off" v-model="inputTodo" @keyup.enter='addTodo'
+                placeholder="What needs to be done?" class="new-todo">
+        </header>
+        <section class="main">
+            <input id="toggle-all" type="checkbox" class="toggle-all">
+            <label for="toggle-all">Mark all as complete</label>
+            <ul class="todo-list" v-cloak>
+                <transition-group name="list-complete" tag="p">
+                    <li class="todo list-complete-item" :class="{completed:item.isDone,editing:item.isEditing}"
+                        v-for="(item, index) in filterTodo" v-bind:key="item.id">
+                        <div class="view">
+                            <input type="checkbox" class="toggle" v-model="item.isDone">
+                            <label @dblclick='editTodo(index)'>{{ item.content}}</label>
+                            <button class="destroy" @click='deleteTodo(index)'></button>
+                        </div> <input type="text" v-focus class="edit" v-model="item.content" @blur='saveEdit(index)'>
+                    </li>
+                </transition-group>
+            </ul>
+        </section>
+        <footer class="footer" v-cloak><span class="todo-count"><strong>{{activeNum}}</strong> items left
+            </span>
+            <ul class="filters">
+                <li><a href="#/all" :class="{selected:change=='All'}" @click='changeFilter("All")'>All</a></li>
+                <li><a href="#/active" :class="{selected:change=='Active'}" @click='changeFilter("Active")'>Active</a>
+                </li>
+                <li><a href="#/completed" :class="{selected:change=='Completed'}"
+                        @click='changeFilter("Completed")'>Completed</a></li>
+            </ul> <button class="clear-completed" v-show=" completedNum!=0" @click='deleteAllCompleted'>
+                Clear completed
+            </button>
+        </footer>
+    </section>
+    <footer class="info">
+        <p>Double-click to edit a todo</p>
+        <p>Written by <a href="http://evanyou.me">Evan You</a></p>
+        <p>Part of <a href="http://todomvc.com">TodoMVC</a></p>
+    </footer>
+</body>
+
+</html>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+    Vue.directive('focus', {
+        // 当被绑定的元素插入到 DOM 中时……
+        update: function (el) {
+            // 聚焦元素
+            el.focus()
+        }
+    })
+
+    let app = new Vue({
+        el: '.todoapp',
+        data: {
+            inputTodo: '',
+            todos: JSON.parse(window.localStorage.getItem('todo')) || [],
+            change: 'All',
+            
+        },
+        methods: {
+            addTodo() {
+                if (this.inputTodo == '') {
+                    alert('please do something!!!')
+                    return;
+                }
+                this.todos.push({
+                    content: this.inputTodo,
+                    isDone: false,
+                    isEditing: false,
+                    id:Date.now()
+                });
+                this.inputTodo = '';
+            },
+            deleteTodo(index) {
+                this.todos.splice(index, 1)
+            },
+            editTodo(index) {
+                // this.todos.forEach(element => {
+                //     element.isEditing=false;
+                // });
+                this.todos[index].isEditing = true
+
+
+            },
+            saveEdit(index) {
+                this.todos[index].isEditing = !this.todos[index].isEditing
+            },
+            changeFilter(filter) {
+                this.change = filter
+            },
+            deleteAllCompleted() {
+                // this.todos.splice('index',1)
+                for (let i = this.todos.length - 1; i >= 0; i--) {
+                    if (this.todos[i].isDone == true) {
+                        this.todos.splice(i, 1)
+                    }
+                }
+            },
+          
+        },
+        watch: {
+            todos: {
+                handler: (val, oldVal) => {
+                    window.localStorage.setItem('todo', JSON.stringify(val))
+                },
+                deep: true
+            },
+
+        },
+        computed: {
+            filterTodo() {
+                if (this.change == 'All') {
+                    return this.todos
+                };
+                return this.todos.filter(evl => {
+                    return this.change == 'Active' ? !evl.isDone : evl.isDone
+                })
+            },
+            activeNum() {
+                return this.todos.filter(evl => {
+                    return !evl.isDone
+                }).length
+            },
+            completedNum() {
+                return this.todos.filter(evl => {
+                    return evl.isDone
+                }).length
+            },
+        },
+    })
+</script>

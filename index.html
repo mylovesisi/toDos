@@ -1,0 +1,194 @@
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <title></title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="googlebot" content="noindex, nofollow">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="./css/index.css">
+    <style>
+        [v-cloak] {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="todoapp">
+        <header class="header">
+            <h1>todos</h1>
+            <input autofocus="autofocus" autocomplete="off" placeholder="你想干什么?" class="new-todo" @keyup.enter='addTodo'
+                v-model.trim="inputTodo">
+        </header>
+        <section class="main">
+            <input id="toggle-all" type="checkbox" class="toggle-all">
+            <label for="toggle-all">Mark all as complete</label>
+            <ul class="todo-list" v-cloak>
+                <li class="todo" :class='{completed:item.isDone,editing:item.isEditing}'
+                    v-for="(item, index) in  fliterTodo">
+                    <div class="view">
+                        <input type="checkbox" v-model="item.isDone" class="toggle">
+                        <label @dblclick='editTodo(index)'>{{ item.content}}</label>
+                        <button class="destroy" @click.stop='deleteTodo(index)'></button>
+                    </div>
+                    <input type="text" v-focus v-model="item.content" @blur='saveEdit(index)' class="edit">
+                </li>
+            </ul>
+        </section>
+        <footer class="footer"><span class="todo-count"><strong>{{activeNum}}</strong> item{{activeNum>1?'s':''}} left
+            </span>
+            <ul class="filters">
+                <li><a href="#/all" :class="{selected:fliter=='All'}" @click='changeFilter("All")'>All</a></li>
+                <li><a href="#/active" :class="{selected:fliter=='Active'}" @click='changeFilter("Active")'>Active</a>
+                </li>
+                <li><a href="#/completed" :class="{selected:fliter=='Completed'}"
+                        @click='changeFilter("Completed")'>Completed</a></li>
+            </ul>
+            <button class="clear-completed" :style="{display: completedNum==0?'none':'block'}" @click='completedDelete'>
+                <!-- 或者利用v-show显示 v-show='completedNum!=0' -->
+                Clear completed
+            </button>
+        </footer>
+    </section>
+    <footer class="info">
+        <p>双击进入编辑状态</p>
+        <p>鸣谢:
+            <a href="http://evanyou.me">Evan You</a>
+        </p>
+        <p>参考于
+            <a href="http://todomvc.com">TodoMVC</a>
+        </p>
+    </footer>
+</body>
+
+</html>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+    // 注册一个全局自定义指令 `v-focus`
+    Vue.directive('focus', {
+        // 当被绑定的元素插入到 DOM 中时……
+        update: function (el) {
+            // 聚焦元素
+            el.focus()
+        }
+    })
+    var app = new Vue({
+        el: '.todoapp',
+        data: {
+            inputTodo: '',
+            //短路运算 ||的含义就是找真 一真则真 找到前面为真则不会寻找后面的
+            todos: JSON.parse(window.localStorage.getItem('todos20')) || [],
+            fliter: 'All',
+        },
+        methods: {
+            //增加输入框的内容到li的lable中
+            addTodo() {
+                if (this.inputTodo == '') {
+                    alert('写点东西啊');
+                    return;
+                }
+                this.todos.push({
+                    content: this.inputTodo,
+                    isDone: false,
+                    isEditing: false,
+                })
+                this.inputTodo = ''
+            },
+            //删除选中的todo
+            deleteTodo(index) {
+                this.todos.splice(index, 1)
+            },
+            //编辑功能
+            editTodo(index) {
+                // event.target.parentNode.parentNode.classList.add('editing')
+                //排他思想 forEach遍历出所有的元素事件触发后给他们为false
+                // this.todos.forEach(element => {
+                //     //    console.log(element);
+                //     element.isEditing = false
+                // });
+                //给指定的修改为true
+                this.todos[index].isEditing = true
+            },
+            //保存修改
+            saveEdit(index) {
+                this.todos[index].isEditing = !this.todos[index].isEditing
+            },
+            //筛选状态的改变
+            changeFilter(fliter) {
+                this.fliter = fliter
+                // console.log(this.fliter);
+            },
+            completedDelete(){
+                /* 删除数组要从后往前删 */
+                for (let  i= this.todos.length-1;i>=0; i--) {
+                    if(this.todos[i].isDone==true){
+                        this.todos.splice(i,1)
+                    }
+                }
+            }
+        },
+        // 数据常驻,在页面关闭时把数据存入在本地中,下一次打开时取到页码渲染,之前使用的是window.onbeforeunload事件,但是过于的繁琐和冗余,每一次更新或者需要都得保存
+        // 所以使用vue中的watch来保存和取值渲染
+        watch: {
+            //watch在数据改变时触发 如果要监控数据更深层的改变,需要加deep属性,默认为最外层
+            todos: {
+                handler: function (val, oldVal) {
+                    window.localStorage.setItem('todos20', JSON.stringify(val))
+                },
+                //这个回调函数会在侦听开始之后立即调用
+                deep: true
+
+            }
+        },
+        computed: {
+            fliterTodo() {
+                if (this.fliter == 'All') {
+                    return this.todos
+                }
+                // let tmpTodo=[];
+                // this.todos.forEach(element => {
+                //     if(this.fliter=='Active'){
+                //         if(element. isDone==false)
+                //             tmpTodo.push(element)
+                //     }else{
+                //         if(element. isDone)
+                //             tmpTodo.push(element)
+                //     }
+                //     console.log(element. isDone);
+
+                // });
+                // console.log(tmpTodo);
+                //     return tmpTodo
+                //使用ES5新增的filter筛选方法 返回新的数组 
+                // let tmpTodo=this.todos.filter(v=>{
+                //     if((this.fliter)=='Active'){
+                //         return !v.isDone
+                //     }else{
+                //         return v.isDone
+                //     }
+                // })
+                // return tmpTodo
+                //filter精简版
+                return this.todos.filter(v => {
+                    return this.fliter == 'Active' ? !v.isDone : v.isDone
+                })
+            },
+            activeNum() {
+                return this.todos.filter(v => {
+                    return !v.isDone
+                }).length
+            },
+            completedNum() {
+                return this.todos.filter(v => {
+                    return v.isDone
+                }).length
+            }
+        },
+
+    })
+
+
+</script>

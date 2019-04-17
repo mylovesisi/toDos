@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        .sisi-enter-active,
+        .sisi-leave-active {
+            transition: opacity .5s;
+        }
+
+        .sisi-enter,
+        .sisi-leave-to
+
+        /* .sisi-leave-active below version 2.1.8 */
+            {
+            opacity: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="demo">
+        <button v-on:click="show=!show">
+            Toggle
+        </button>
+        <transition name="sisi">
+            <p v-if="show">hello</p>
+        </transition>
+    </div>
+</body>
+
+</html>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<script>
+   let app= new Vue({
+        el: '#demo',
+        data: {
+            show: true
+        },
+        // methods: {
+        //     shows(){
+        //         this.show=!this.show
+        //     }
+        // },
+    })
+
+
+</script>

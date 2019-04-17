@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+</html>
+<script>
+    /* 
+        ES5
+            数组的新方法
+                filter
+                forEach
+        ES6 
+     */
+    let arr=[1,2,3,4,5,6]
+    // arr.forEach((v,i,arr) => {
+    //     console.log(v,i,arr);
+    // });
+    //筛选方法
+    // 根据你给定的条件,筛选出新的数组
+    // 循环数组
+    // 都有三个参数,v==数组中的每个值,i==索引,arr==原数组
+    let newArr=arr.filter((v,i,arr)=>{
+        // console.log(v,i,arr);
+        return v>3
+    })
+    console.log(newArr);// 4 5 6
+    //时间戳
+    var time=Date.now()
+    console.log(time);
+</script>
